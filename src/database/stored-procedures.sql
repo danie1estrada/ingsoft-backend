@@ -4,7 +4,7 @@ DELIMITER //
 
 /**
  * @author Daniel Estrada
- * @description Insert a new user to the database
+ * @description Inserts a new user to the database
  * @param n_control
  * @param name
  * @param last_name
@@ -15,7 +15,7 @@ CREATE PROCEDURE `insert_user` (
     `nControl` INT(8),
     `name` VARCHAR(30),
     `lastName` VARCHAR(30),
-    `email` VARCHAR(30),
+    `email` VARCHAR(45),
     `password` VARCHAR(32)
 )
 BEGIN
@@ -33,6 +33,18 @@ BEGIN
         `email`,
         `password`
     );
+    
+    SELECT
+		`id` as 'id',
+        `nControl` as 'nControl',
+        `name` as 'name',
+        `lastName` as 'lastName',
+        `email` as 'email',
+        `role` as 'role'
+	FROM
+		`users`
+    WHERE
+		`users`.`id` = LAST_INSERT_ID();
 END //
 
 /**
@@ -42,8 +54,8 @@ END //
  * @param password
  */
 CREATE PROCEDURE `get_user` (
-	`emailv` VARCHAR(30),
-    `password` VARCHAR(32)
+	`userEmail` VARCHAR(30),
+    `userPassword` VARCHAR(32)
 )
 BEGIN
 	SELECT
@@ -53,19 +65,21 @@ BEGIN
         `lastName`,
         `email`,
         `role`
-	FROM `users`
+	FROM
+		`users`
     WHERE
-		`users`.`email` = `emailv`
+		`users`.`email` = userEmail
 	AND
-        `users`.`password` = `password`;
+        `users`.`password` = userPassword;
 END //
 
 CREATE PROCEDURE `insert_product` (
-	`name` VARCHAR(25),
+	`name` VARCHAR(45),
     `description` TEXT,
     `price` DECIMAL(6, 2),
     `vendorID`INT(8),
-    `categoryID` INT(8)
+    `categoryID` INT(8),
+    `image` VARCHAR(50) 
 )
 BEGIN
 	INSERT INTO `products` (
@@ -73,15 +87,19 @@ BEGIN
 		`description`,
 		`price`,
         `vendorID`,
-		`categoryID`
+		`categoryID`,
+        `image`
     )
     VALUES (
 		`name`,
 		`description`,
 		`price`,
         `vendorID`,
-		`categoryID`
+		`categoryID`,
+        `image`
     );
+    
+    SELECT LAST_INSERT_ID() AS 'insertedID';
 END //
 
 CREATE PROCEDURE get_product_by_id (
@@ -176,8 +194,6 @@ BEGIN
 		`purchaserID` = `userID`;
 END //
 
-DROP PROCEDURE `purchases_by_user`;
-DELIMITER //
 CREATE PROCEDURE `purchases_by_user` (
 	id INT(8)
 )
@@ -194,41 +210,3 @@ BEGIN
 END //
 
 DELIMITER ;
-
-CALL purchases_by_user(1);
-
-INSERT INTO `categories` (`categoryName`) VALUES ('Libros');
-INSERT INTO `categories` (`categoryName`) VALUES ('Electrónica');
-INSERT INTO `categories` (`categoryName`) VALUES ('Papelería');
-INSERT INTO `categories` (`categoryName`) VALUES ('Cómputo');
-INSERT INTO `categories` (`categoryName`) VALUES ('Varios');
-
--- CALL insert_user(n_control, name, last_name, email, password)
-CALL insert_user(16240919, 'Daniel', 'Estrada', 'dannesr97@gmail.com', 'cthulhu');
--- SELECT * FROM users;
-
--- CALL get_user(email, password)
-
--- CALL insert_product(name, description, price, id_vendor, id_category)
-CALL insert_product('Protoboard',          'Semi nuevo, continuo', 60,   2, 2);
-CALL insert_product('Cálculo Diferencial', 'G. Zill 8va edición',  150,  2, 1);
-CALL insert_product('Arduino Uno',         'Nuevo',                280,  2, 2);
-CALL insert_product('Laptop',              '14" Core i5, 8 RAM',   8000, 2, 4);
-CALL insert_product('Java Cómo Programar', 'Deitel 4ta edición',   200,  2, 1);
--- SELECT * FROM products;
-
--- CALL add_to_cart(id_purchaser, id_product, quantity)
-CALL add_to_cart(1, 3, 2);
-CALL add_to_cart(1, 1, 2);
-CALL add_to_cart(1, 5, 1);
-CALL add_to_cart(1, 2, 1);
-
--- CALL purchase(id_purchaser)
-CALL purchase(1);
--- CALL get_cart(1);
--- SELECT * FROM sales;
-
-CALL get_cart(1);
-
-
-

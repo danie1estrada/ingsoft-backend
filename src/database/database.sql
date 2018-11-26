@@ -7,7 +7,7 @@ CREATE TABLE `users` (
     `nControl` INT(8) NOT NULL,
     `name` VARCHAR(30) NOT NULL,
     `lastName` VARCHAR(30) NOT NULL,
-    `email` VARCHAR(30) NOT NULL,
+    `email` VARCHAR(45) NOT NULL,
     `password` VARCHAR(32) NOT NULL,
     `role` VARCHAR(5) DEFAULT 'user',
     UNIQUE(`nControl`),
@@ -17,7 +17,7 @@ CREATE TABLE `users` (
 
 CREATE TABLE `categories` (
     `id` INT(8) NOT NULL AUTO_INCREMENT,
-    `categoryName` VARCHAR(25) NOT NULL,
+    `categoryName` VARCHAR(35) NOT NULL,
     PRIMARY KEY (`id`)
 );
 
@@ -26,7 +26,7 @@ CREATE TABLE `products` (
     `name` VARCHAR(45) NOT NULL,
     `description` TEXT NOT NULL,
     `price` DECIMAL(6, 2) NOT NULL,
-    -- `image` TEXT DEFAULT 'default-image',
+    `image` VARCHAR(50) DEFAULT 'default-image',
     `vendorID` INT(8) NOT NULL,
     `categoryID` INT(8) NOT NULL,
     PRIMARY KEY (`id`),

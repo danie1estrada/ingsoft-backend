@@ -1,6 +1,5 @@
 USE db;
 
-DROP VIEW `vw_products`;
 CREATE VIEW `vw_products`
 AS
 SELECT
@@ -8,10 +7,11 @@ SELECT
 	p.`name`,
 	p.`description`,
     p.`price`,
+    p.`image`,
     p.`categoryID`,
     c.`categoryName`,
-    p.`vendorID`-- ,
-    -- concat(u.`name`, ' ', u.`lastName`) AS `vendor`
+    p.`vendorID`,
+    concat(u.`name`, ' ', u.`lastName`) AS `vendor`
 FROM
 	`products` p INNER JOIN
     `categories` c INNER JOIN
@@ -53,6 +53,5 @@ ON
 	s.`productID` = p.`id` AND
     s.`purchaserID`= u.`id`;
 	
-SELECT * FROM `sales`;
 
--- mandarle a esaU curso y libro
+-- mandarle a esau el curso y libro
