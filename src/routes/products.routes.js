@@ -1,4 +1,5 @@
-const connection = require('../database/db');
+const connection = require('../database/connection');
+const nodemailer = require('nodemailer');
 const express    = require('express');
 const router     = express.Router();
 
@@ -31,9 +32,10 @@ router.post('/shopping-cart', (req, res) => {
 
 router.get('/:id', (req, res) => {
     let query = 'CALL get_product_by_id(?)';
-
+    
     connection.query(query, [req.params.id], (err, results) => {
         if (err) return res.status(500).send(err);
+        if (results[0].length == 0) return res.status(404).send({ Error: '404 Not found' });
         res.status(200).json(results[0]);
     });
 });
@@ -73,8 +75,40 @@ router.post('/add-to-cart', (req, res) => {
     ];
 
     connection.query(query, values, (err, results) => {
-        if (err) return res.status(500).send(err);
+        if (err) return res.status(500).json(err);
         res.status(200).json(results);
+    });
+});
+
+router.post('/purchase', (req, res) => {
+    let query = 'CALL purchase(?)';
+
+    let product = req.body.product;
+    let vendorEmail = req.body.vendorEmail;
+    let purchaserEmail = req.body.purchaserEmail;
+
+    let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'itl.bazar.tec@gmail.com',
+            pass: '8caracteres'
+        }
+    });
+    
+    let mailOptions = {
+        from: '"BazarTec" <itl.bazar.tec@gmail.com>',
+        to: vendorEmail,
+        subject: `Ha aparecido un comprador para '${product}'`,
+        text: `Hola, te informamos que ha aparecido un comprador para tu artículo '${product}'. Comunícate con el comprador al correo: ${purchaserEmail}`
+    };
+    
+    connection.query(query, [req.body.purchaserID], (err, results) => {
+        if (err) return res.status(500).json(err);
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) return res.status(500).json(error);
+            res.status(200).json({ ok: true, info });
+        });
     });
 });
 

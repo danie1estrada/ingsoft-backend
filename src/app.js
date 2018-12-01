@@ -1,4 +1,4 @@
-const routes  = require('./routes/routes.index');
+const routes  = require('./routes/index.routes');
 const express = require('express');
 const app     = express();
 
@@ -8,7 +8,7 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Methods', '*');
     res.header('Access-Control-Allow-Headers', '*');
     next();
-})
+});
 
 // routes
 app.use('/api', routes);
