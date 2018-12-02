@@ -1,11 +1,12 @@
 /*******************************************************************************
                                 BASE DE DATOS
 *******************************************************************************/
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'admin';
 DROP DATABASE IF EXISTS bazar_tec;
 CREATE DATABASE IF NOT EXISTS bazar_tec;
 USE bazar_tec;
 
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
     `id` INT(8) NOT NULL AUTO_INCREMENT,
     `nControl` INT(8) NOT NULL,
     `name` VARCHAR(30) NOT NULL,
@@ -18,13 +19,13 @@ CREATE TABLE `users` (
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `categories` (
+CREATE TABLE IF NOT EXISTS `categories` (
     `id` INT(8) NOT NULL AUTO_INCREMENT,
     `categoryName` VARCHAR(35) NOT NULL,
     PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `products` (
+CREATE TABLE IF NOT EXISTS `products` (
     `id` INT(8) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(45) NOT NULL,
     `description` TEXT NOT NULL,
@@ -38,7 +39,7 @@ CREATE TABLE `products` (
     FOREIGN KEY (`categoryID`) REFERENCES `categories` (`id`)
 );
 
-CREATE TABLE `shopping_cart` (
+CREATE TABLE IF NOT EXISTS `shopping_cart` (
     `vendorID` INT(8) NOT NULL,
     `purchaserID` INT(8) NOT NULL,
     `productID` INT(8) NOT NULL,
@@ -49,7 +50,7 @@ CREATE TABLE `shopping_cart` (
     FOREIGN KEY (`productID`) REFERENCES `products` (`id`)
 );
 
-CREATE TABLE `sales` (
+CREATE TABLE IF NOT EXISTS `sales` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `vendorID` INT(8) NOT NULL,
     `purchaserID` INT(8) NOT NULL,
