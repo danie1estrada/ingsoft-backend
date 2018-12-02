@@ -50,19 +50,51 @@ router.get('/categories/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    let query = 'CALL insert_product(?, ?, ?, ?, ?, ?)';
-    let values = [
-        req.body.name,
-        req.body.description,
-        req.body.price,
-        req.body.vendorID,
-        req.body.categoryID,
-        null
-    ]
+    if (!req.files) {
+        return res.status(400).json({
+            ok: false,
+            status: 400,
+            message: 'No files were uploaded'
+        });
+    }
+    
+    let allowedExtensions = ['jpg', 'jpeg', 'png', 'gif'];
+    let image = req.files.image;
+    let name = image.name.split('.');
+    let extension = name[name.length - 1].toLowerCase();
+    let filename = `${new Date().toISOString().replace(/:/g, '-').replace('.', '-')}.${extension}`;
 
-    connection.query(query, values, (err, results) => {
-        if (err) return res.status(500).send(err);
-        res.status(200).json(results[0][0]);
+    if (!allowedExtensions.includes(extension)) {
+        return res.status(400).json({
+            ok: false,
+            status: 400,
+            message: `Invalid file extension: .${extension}`
+        });
+    }
+
+    image.mv(`public/images/${filename}`, err => {
+        if (err) return res.status(500).json(err);
+
+        let query = 'CALL insert_product(?, ?, ?, ?, ?, ?)';
+        let values = [
+            req.body.name,
+            req.body.description,
+            req.body.price,
+            req.body.vendorID,
+            req.body.categoryID,
+            filename
+        ]
+
+        connection.query(query, values, (err, results) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    status: 500,
+                    err
+                });
+            }
+            res.status(200).json(results[0][0]);
+        });
     });
 });
 
@@ -98,7 +130,7 @@ router.post('/purchase', (req, res) => {
     let mailOptions = {
         from: '"BazarTec" <itl.bazar.tec@gmail.com>',
         to: vendorEmail,
-        subject: `Ha aparecido un comprador para '${product}'`,
+        subject: `Ha aparecido un comprador para tu artículo '${product}'`,
         text: `Hola, te informamos que ha aparecido un comprador para tu artículo '${product}'. Comunícate con el comprador al correo: ${purchaserEmail}`
     };
     
